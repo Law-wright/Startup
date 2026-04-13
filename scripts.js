@@ -3,12 +3,18 @@
 ===================================================== */
 const navAnchors = document.querySelectorAll(".nav-menu a");
 const sections = document.querySelectorAll("section[id]");
+const topHeader = document.getElementById("top-header");
+
+function headerScrollOffset() {
+  return topHeader ? topHeader.offsetHeight + 16 : 96;
+}
 
 function setActiveNavLink() {
   let current = "";
+  const offset = headerScrollOffset();
 
   sections.forEach((section) => {
-    const top = section.offsetTop - 120;
+    const top = section.offsetTop - offset;
     const height = section.offsetHeight;
 
     if (window.scrollY >= top && window.scrollY < top + height) {
@@ -27,8 +33,22 @@ function setActiveNavLink() {
   });
 }
 
-window.addEventListener("scroll", setActiveNavLink);
-window.addEventListener("load", setActiveNavLink);
+function updateTopHeaderScrollState() {
+  if (topHeader) {
+    topHeader.classList.toggle("is-scrolled", window.scrollY > 40);
+  }
+}
+
+function onNavScroll() {
+  setActiveNavLink();
+  updateTopHeaderScrollState();
+}
+
+window.addEventListener("scroll", onNavScroll, { passive: true });
+window.addEventListener("load", () => {
+  setActiveNavLink();
+  updateTopHeaderScrollState();
+});
 
 /* =====================================================
    Hero Canvas — particles, ambient orbs, dot grid
