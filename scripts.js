@@ -1,3 +1,6 @@
+/* =====================================================
+   Nav scroll active state
+===================================================== */
 const navAnchors = document.querySelectorAll(".nav-menu a");
 const sections = document.querySelectorAll("section[id]");
 
@@ -26,3 +29,260 @@ function setActiveNavLink() {
 
 window.addEventListener("scroll", setActiveNavLink);
 window.addEventListener("load", setActiveNavLink);
+
+/* =====================================================
+   Hero Canvas — particles, ambient orbs, dot grid
+===================================================== */
+(function initHeroCanvas() {
+  const canvas = document.getElementById("hero-canvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  let W, H, animId;
+  let mouse = { x: -9999, y: -9999 };
+  let paused = false;
+
+  /* ---- resize ---- */
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  /* ---- particles ---- */
+  const PARTICLE_COUNT = 70;
+  const particles = [];
+
+  function randBetween(a, b) { return a + Math.random() * (b - a); }
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push({
+      x: Math.random() * (W || 1200),
+      y: Math.random() * (H || 800),
+      r: randBetween(0.8, 2.4),
+      vx: randBetween(-0.18, 0.18),
+      vy: randBetween(-0.14, 0.14),
+      alpha: randBetween(0.18, 0.55),
+      /* slow pulse */
+      pulseSpeed: randBetween(0.006, 0.016),
+      pulseOffset: Math.random() * Math.PI * 2,
+    });
+  }
+
+  /* ---- ambient orbs ---- */
+  const orbs = [
+    {
+      baseX: 0.72, baseY: 0.22,
+      radius: 320,
+      color: "rgba(255, 122, 0, 0.13)",
+      driftAmp: 0.06, driftFreqX: 0.00028, driftFreqY: 0.00021,
+    },
+    {
+      baseX: 0.18, baseY: 0.65,
+      radius: 260,
+      color: "rgba(180, 130, 255, 0.07)",
+      driftAmp: 0.05, driftFreqX: 0.00019, driftFreqY: 0.00031,
+    },
+    {
+      baseX: 0.55, baseY: 0.88,
+      radius: 200,
+      color: "rgba(255, 200, 80, 0.06)",
+      driftAmp: 0.04, driftFreqX: 0.00035, driftFreqY: 0.00017,
+    },
+  ];
+
+  /* ---- dot grid ---- */
+  const GRID_COLS = 28;
+  const GRID_ROWS = 18;
+
+  function drawDotGrid(t) {
+    const colSpacing = W / GRID_COLS;
+    const rowSpacing = H / GRID_ROWS;
+    const warpStrength = 14;
+    const mouseInfluenceRadius = 200;
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.09)";
+
+    for (let r = 0; r <= GRID_ROWS; r++) {
+      for (let c = 0; c <= GRID_COLS; c++) {
+        let gx = c * colSpacing;
+        let gy = r * rowSpacing;
+
+        /* subtle time-based undulation */
+        gx += Math.sin(t * 0.00045 + r * 0.6) * 1.8;
+        gy += Math.cos(t * 0.00038 + c * 0.5) * 1.8;
+
+        /* warp toward mouse */
+        const dx = mouse.x - gx;
+        const dy = mouse.y - gy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < mouseInfluenceRadius && dist > 0) {
+          const pull = (1 - dist / mouseInfluenceRadius) * warpStrength;
+          gx += (dx / dist) * pull;
+          gy += (dy / dist) * pull;
+        }
+
+        const dotR = 0.9;
+        ctx.beginPath();
+        ctx.arc(gx, gy, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  /* ---- draw ambient orbs ---- */
+  function drawOrbs(t) {
+    orbs.forEach((orb) => {
+      const cx = (orb.baseX + Math.sin(t * orb.driftFreqX) * orb.driftAmp) * W;
+      const cy = (orb.baseY + Math.cos(t * orb.driftFreqY) * orb.driftAmp) * H;
+
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, orb.radius);
+      grad.addColorStop(0, orb.color);
+      grad.addColorStop(1, "transparent");
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, orb.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  /* ---- draw particles ---- */
+  function drawParticles(t) {
+    particles.forEach((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      /* wrap at edges */
+      if (p.x < -4) p.x = W + 4;
+      if (p.x > W + 4) p.x = -4;
+      if (p.y < -4) p.y = H + 4;
+      if (p.y > H + 4) p.y = -4;
+
+      const pulse = 0.5 + 0.5 * Math.sin(t * p.pulseSpeed + p.pulseOffset);
+      const alpha = p.alpha * (0.65 + 0.35 * pulse);
+
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  /* ---- main loop ---- */
+  function loop(t) {
+    if (paused) { animId = requestAnimationFrame(loop); return; }
+
+    ctx.clearRect(0, 0, W, H);
+
+    /* dark base */
+    ctx.fillStyle = "#050505";
+    ctx.fillRect(0, 0, W, H);
+
+    drawOrbs(t);
+    drawDotGrid(t);
+    drawParticles(t);
+
+    animId = requestAnimationFrame(loop);
+  }
+
+  animId = requestAnimationFrame(loop);
+
+  /* pause when tab hidden — save battery/CPU */
+  document.addEventListener("visibilitychange", () => {
+    paused = document.hidden;
+  });
+
+  /* ---- cursor tracking (for canvas warp + CSS glow) ---- */
+  const heroSection = document.querySelector(".hero");
+  const cursorGlow = document.querySelector(".hero-cursor-glow");
+
+  if (heroSection) {
+    heroSection.addEventListener("mousemove", (e) => {
+      const rect = heroSection.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+
+      if (cursorGlow) {
+        const px = ((e.clientX - rect.left) / rect.width * 100).toFixed(2);
+        const py = ((e.clientY - rect.top) / rect.height * 100).toFixed(2);
+        cursorGlow.style.setProperty("--cx", `${px}%`);
+        cursorGlow.style.setProperty("--cy", `${py}%`);
+      }
+    });
+
+    heroSection.addEventListener("mouseleave", () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    });
+  }
+})();
+
+/* =====================================================
+   Hero — staggered entrance animations
+===================================================== */
+(function heroEntrance() {
+  const selectors = [".eyebrow", "h1", ".hero-text", ".hero-buttons"];
+  const delays = [0, 160, 320, 480];
+
+  selectors.forEach((sel, i) => {
+    const el = document.querySelector(`.hero-content ${sel}`);
+    if (!el) return;
+    setTimeout(() => el.classList.add("visible"), delays[i]);
+  });
+})();
+
+/* =====================================================
+   Hero — scroll parallax
+===================================================== */
+(function heroParallax() {
+  const hero = document.querySelector(".hero");
+  const content = document.querySelector(".hero-content");
+  if (!hero || !content) return;
+
+  function onScroll() {
+    const heroH = hero.offsetHeight;
+    const scrollY = window.scrollY;
+
+    /* only apply while hero is visible */
+    if (scrollY > heroH) return;
+
+    content.style.transform = `translateY(${scrollY * 0.18}px)`;
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+})();
+
+/* =====================================================
+   FAQ accordion
+===================================================== */
+(function initFaqAccordion() {
+  const items = document.querySelectorAll("#faqs .faq-item");
+  if (!items.length) return;
+
+  items.forEach((item) => {
+    const btn = item.querySelector(".faq-trigger");
+    const panel = item.querySelector(".faq-panel");
+    if (!btn || !panel) return;
+
+    btn.addEventListener("click", () => {
+      const willOpen = !item.classList.contains("is-open");
+
+      items.forEach((other) => {
+        other.classList.remove("is-open");
+        const b = other.querySelector(".faq-trigger");
+        const p = other.querySelector(".faq-panel");
+        if (b) b.setAttribute("aria-expanded", "false");
+        if (p) p.setAttribute("aria-hidden", "true");
+      });
+
+      if (willOpen) {
+        item.classList.add("is-open");
+        btn.setAttribute("aria-expanded", "true");
+        panel.setAttribute("aria-hidden", "false");
+      }
+    });
+  });
+})();

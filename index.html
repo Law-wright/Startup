@@ -30,23 +30,27 @@
 
   <!-- Hero -->
   <section class="hero" id="home">
-    <div class="hero-overlay"></div>
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-cursor-glow"></div>
     <div class="container hero-content">
-      <p class="eyebrow">Web Infrastructure • AI Automation • Digital Systems</p>
+      <p class="eyebrow">Website Development • Digital Workflow Setup • Client Intake Systems</p>
       <h1>
-        Building <span>Intelligent</span><br />
-        Digital Experiences
+        Websites and Workflows built<br />
+        for <span>Growth</span><br />
+ 
       </h1>
       <p class="hero-text">
-        Wright Intelligent Systems LLC helps businesses elevate their online
-        presence, automate operations, and build scalable systems that support
-        long-term growth.
+        Wright Intelligent Systems creates modern websites and refined 
+        digital systems that help businesses strengthen their presence, 
+        improve inquiry flow, and grow with clarity.
       </p>
-
       <div class="hero-buttons">
-        <a href="#contact" class="btn btn-primary">Contact Me</a>
+        <a href="#contact" class="btn btn-primary">Get Started</a>
         <a href="#services" class="btn btn-secondary">Explore Services</a>
       </div>
+    </div>
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <span></span>
     </div>
   </section>
 
@@ -150,39 +154,143 @@
   </section>
 
   <!-- FAQs -->
-  <section id="faqs">
+  <section id="faqs" class="faq-section">
     <div class="container">
       <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
-      <p class="section-subtitle">
-        A few common questions about our process, services, and how to get
-        started.
+      <p class="section-subtitle faq-section-intro">
+        A few common questions about our services, process, investment, and what it looks like to work together.
       </p>
 
-      <div class="cards">
-        <article class="card">
-          <h3>What does Wright Intelligent Systems LLC do?</h3>
-          <p>
-            We provide web infrastructure, AI automation, and digital systems
-            that help businesses improve efficiency and strengthen their digital
-            presence.
-          </p>
-        </article>
+      <div class="faq-accordion">
+        <div class="faq-item">
+          <button
+            type="button"
+            class="faq-trigger"
+            id="faq-trigger-1"
+            aria-expanded="false"
+            aria-controls="faq-panel-1"
+          >
+            <span class="faq-question">What does Wright Intelligent Systems do?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div
+            id="faq-panel-1"
+            class="faq-panel"
+            role="region"
+            aria-labelledby="faq-trigger-1"
+            aria-hidden="true"
+          >
+            <div class="faq-panel-inner">
+              <p class="faq-answer">
+                We design modern websites and refined digital experiences that help businesses strengthen their presence, improve inquiry flow, and create a more polished client journey.
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <article class="card">
-          <h3>Who do you work with?</h3>
-          <p>
-            We work with startups, entrepreneurs, small businesses, and brands
-            seeking modern digital solutions with a premium feel.
-          </p>
-        </article>
+        <div class="faq-item">
+          <button
+            type="button"
+            class="faq-trigger"
+            id="faq-trigger-2"
+            aria-expanded="false"
+            aria-controls="faq-panel-2"
+          >
+            <span class="faq-question">Who do you work with?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div
+            id="faq-panel-2"
+            class="faq-panel"
+            role="region"
+            aria-labelledby="faq-trigger-2"
+            aria-hidden="true"
+          >
+            <div class="faq-panel-inner">
+              <p class="faq-answer">
+                We work with startups, entrepreneurs, service-based businesses, and growing brands seeking a more polished digital presence.
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <article class="card">
-          <h3>How do I get started?</h3>
-          <p>
-            Reach out through the contact form below and share your goals,
-            project ideas, or business needs.
-          </p>
-        </article>
+        <div class="faq-item">
+          <button
+            type="button"
+            class="faq-trigger"
+            id="faq-trigger-3"
+            aria-expanded="false"
+            aria-controls="faq-panel-3"
+          >
+            <span class="faq-question">Do you offer custom pricing?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div
+            id="faq-panel-3"
+            class="faq-panel"
+            role="region"
+            aria-labelledby="faq-trigger-3"
+            aria-hidden="true"
+          >
+            <div class="faq-panel-inner">
+              <p class="faq-answer">
+                Yes. Every project is shaped by scope, features, integrations, and timeline. Starting prices are available for signature offers, while larger or more tailored projects are quoted based on business needs.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button
+            type="button"
+            class="faq-trigger"
+            id="faq-trigger-4"
+            aria-expanded="false"
+            aria-controls="faq-panel-4"
+          >
+            <span class="faq-question">How long does a typical project take?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div
+            id="faq-panel-4"
+            class="faq-panel"
+            role="region"
+            aria-labelledby="faq-trigger-4"
+            aria-hidden="true"
+          >
+            <div class="faq-panel-inner">
+              <p class="faq-answer">
+                Timelines depend on the scope of the work, but most smaller projects are completed within one to three weeks. More custom or expanded builds may require additional time.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button
+            type="button"
+            class="faq-trigger"
+            id="faq-trigger-5"
+            aria-expanded="false"
+            aria-controls="faq-panel-5"
+          >
+            <span class="faq-question">How do I get started?</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </button>
+          <div
+            id="faq-panel-5"
+            class="faq-panel"
+            role="region"
+            aria-labelledby="faq-trigger-5"
+            aria-hidden="true"
+          >
+            <div class="faq-panel-inner">
+              <p class="faq-answer">
+                Start by reaching out through the contact form with a few details about your business, goals, and project needs. We’ll review your inquiry and follow up with next steps.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
