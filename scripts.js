@@ -306,3 +306,77 @@ window.addEventListener("load", () => {
     });
   });
 })();
+
+/* =====================================================
+   Contact form → Supabase Edge Function
+===================================================== */
+(function initContactForm() {
+  const SUPABASE_URL      = 'https://wthxedaitotnfvzrmjxm.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0aHhlZGFpdG90bmZ2enJtanhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTM4MDMsImV4cCI6MjA5MTc4OTgwM30.Jhl0Oh5z36crSC-gpLTVTCcuDaHarQMhmQNWti4PyFA';
+  const FUNCTION_URL      = SUPABASE_URL + '/functions/v1/submit-lead';
+
+  const form   = document.getElementById('contact-form');
+  const status = document.getElementById('contact-form-status');
+  const btn    = form ? form.querySelector('button[type="submit"]') : null;
+
+  if (!form || !status || !btn) return;
+
+  function setStatus(type, msg) {
+    status.className = type ? 'contact-form-status--' + type : '';
+    status.textContent = msg;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    /* honeypot check */
+    if (form.querySelector('[name="_gotcha"]').value) return;
+
+    /* Turnstile token — populated automatically by the widget */
+    const tokenInput = form.querySelector('[name="cf-turnstile-response"]');
+    const token = tokenInput ? tokenInput.value : '';
+    if (!token) {
+      setStatus('error', 'Please complete the security check before submitting.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+    setStatus('', '');
+
+    let res, data;
+    try {
+      res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          token,
+          full_name:           form.querySelector('[name="name"]').value.trim(),
+          email:               form.querySelector('[name="email"]').value.trim(),
+          company_name:        form.querySelector('[name="company"]').value.trim() || null,
+          phone:               form.querySelector('[name="phone"]').value.trim() || null,
+          service_type:        form.querySelector('[name="service_needed"]').value || null,
+          timeline:            form.querySelector('[name="timeline"]').value || null,
+          project_description: form.querySelector('[name="message"]').value.trim(),
+        }),
+      });
+      data = await res.json();
+    } catch (_) {
+      data = { error: 'Network error' };
+    }
+
+    if (!res || !res.ok || data.error) {
+      setStatus('error', 'Something went wrong. Please try again or email us directly.');
+      if (window.turnstile) window.turnstile.reset();
+      btn.disabled = false;
+      btn.textContent = 'Send inquiry';
+    } else {
+      setStatus('success', 'Your inquiry was received. We\u2019ll be in touch within 24\u201348 business hours.');
+      form.reset();
+      btn.textContent = 'Send inquiry';
+    }
+  });
+})();

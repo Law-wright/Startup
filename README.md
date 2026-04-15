@@ -66,4 +66,4 @@ Because this is a static website, it can be deployed to platforms like:
 
 ## License
 
-Private project for Wright Intelligent Systems LLC.
+Private project for Wright Intelligent Systems.

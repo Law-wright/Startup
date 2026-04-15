@@ -323,8 +323,7 @@
         <div class="contact-main">
           <form
             class="contact-form"
-            action="https://formspree.io/f/xeepyqrb"
-            method="POST"
+            id="contact-form"
           >
             <input
               type="text"
@@ -353,10 +352,22 @@
               </label>
             </div>
 
-            <label class="contact-field">
-              <span class="contact-label">Company name</span>
-              <input type="text" name="company" placeholder="Your organization" autocomplete="organization" />
-            </label>
+            <div class="contact-form-grid">
+              <label class="contact-field">
+                <span class="contact-label">Company name</span>
+                <input type="text" name="company" placeholder="Your organization" autocomplete="organization" />
+              </label>
+              <label class="contact-field">
+                <span class="contact-label">Phone number</span>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="(***) ***-***"
+                  autocomplete="tel"
+                  inputmode="tel"
+                />
+              </label>
+            </div>
 
             <div class="contact-form-grid">
               <label class="contact-field">
@@ -399,9 +410,17 @@
               confirmation when your inquiry is received.
             </p>
 
+            <div
+              class="cf-turnstile"
+              data-sitekey="0x4AAAAAAC9xS5Ql4H3Gw5j5"
+              data-theme="dark"
+            ></div>
+
             <button type="submit" class="btn btn-primary btn-contact-submit">
               Send inquiry
             </button>
+
+            <div id="contact-form-status" role="alert" aria-live="polite"></div>
           </form>
 
           <div class="contact-direct">
@@ -464,5 +483,6 @@
   </footer>
 
   <script src="scripts.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>
 </html>

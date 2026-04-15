@@ -6,6 +6,7 @@
     "start": "serve -l 3000 ."
   },
   "devDependencies": {
-    "serve": "^14.2.4"
+    "serve": "^14.2.4",
+    "supabase": "^2.91.1"
   }
 }

@@ -22,7 +22,8 @@
   --border-color: rgba(255, 255, 255, 0.1);
   --shadow-color: rgba(0, 0, 0, 0.35);
   --max-width: 1200px;
-  --header-height: 72px;
+  --header-height: 84px;
+  --logo-vertical-padding: 10px;
 }
 
 /* =========================
@@ -63,7 +64,7 @@ html {
   justify-content: space-between;
   gap: clamp(16px, 3vw, 32px);
   min-height: var(--header-height);
-  padding: 10px 0;
+  padding: 0;
 }
 
 .nav-brand {
@@ -71,6 +72,7 @@ html {
   align-items: center;
   flex-shrink: 0;
   line-height: 0;
+  padding-block: var(--logo-vertical-padding);
   border-radius: 8px;
   transition: opacity 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease;
 }
@@ -86,9 +88,9 @@ html {
 }
 
 .nav-brand img {
-  height: clamp(30px, 4.5vw, 44px);
+  height: calc(var(--header-height) - (var(--logo-vertical-padding) * 2));
   width: auto;
-  max-width: min(200px, 42vw);
+  max-width: min(280px, 52vw);
   object-fit: contain;
 }
 
@@ -1107,7 +1109,12 @@ footer p {
     gap: 10px 22px;
   }
 
+  .nav-brand {
+    padding-block: 4px;
+  }
+
   .nav-brand img {
+    height: clamp(34px, 9vw, 52px);
     max-width: min(240px, 72vw);
   }
 
@@ -1183,4 +1190,29 @@ footer p {
   .about-text {
     padding: 24px;
   }
+}
+
+/* =====================================================
+   Contact form status feedback
+===================================================== */
+#contact-form-status:empty { display: none; }
+
+.contact-form-status--success {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: rgba(40, 200, 120, 0.12);
+  border: 1px solid rgba(40, 200, 120, 0.35);
+  color: #28c878;
+  font-size: 0.9rem;
+}
+
+.contact-form-status--error {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: rgba(220, 60, 60, 0.1);
+  border: 1px solid rgba(220, 60, 60, 0.3);
+  color: #e05555;
+  font-size: 0.9rem;
 }
