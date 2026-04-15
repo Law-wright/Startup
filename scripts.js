@@ -326,15 +326,62 @@ window.addEventListener("load", () => {
     status.textContent = msg;
   }
 
+  /**
+   * Turnstile may inject `cf-turnstile-response` outside the <form> or only
+   * expose the token via the JS API — so we resolve the token several ways.
+   */
+  function getTurnstileToken(formEl) {
+    const sel =
+      'input[name="cf-turnstile-response"],textarea[name="cf-turnstile-response"]';
+
+    function lastNonEmpty(root) {
+      let last = '';
+      root.querySelectorAll(sel).forEach((el) => {
+        const v = (el.value && el.value.trim()) || '';
+        if (v) last = v;
+      });
+      return last;
+    }
+
+    let t = lastNonEmpty(formEl);
+    if (t) return t;
+    t = lastNonEmpty(document);
+    if (t) return t;
+
+    if (typeof window.turnstile !== 'undefined' && typeof window.turnstile.getResponse === 'function') {
+      try {
+        const g = window.turnstile.getResponse();
+        if (g && String(g).trim()) return String(g).trim();
+      } catch (_) { /* try widget id */ }
+      const wid = formEl.querySelector('[id^="cf-chl-widget"]');
+      if (wid && wid.id) {
+        try {
+          const g = window.turnstile.getResponse(wid.id);
+          if (g && String(g).trim()) return String(g).trim();
+        } catch (_) { /* ignore */ }
+      }
+    }
+    return '';
+  }
+
+  function resetTurnstileWidget(formEl) {
+    if (typeof window.turnstile === 'undefined' || typeof window.turnstile.reset !== 'function') {
+      return;
+    }
+    const wid = formEl.querySelector('[id^="cf-chl-widget"]');
+    try {
+      if (wid && wid.id) window.turnstile.reset(wid.id);
+      else window.turnstile.reset();
+    } catch (_) { /* ignore */ }
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     /* honeypot check */
     if (form.querySelector('[name="_gotcha"]').value) return;
 
-    /* Turnstile token — populated automatically by the widget */
-    const tokenInput = form.querySelector('[name="cf-turnstile-response"]');
-    const token = tokenInput ? tokenInput.value : '';
+    const token = getTurnstileToken(form);
     if (!token) {
       setStatus('error', 'Please complete the security check before submitting.');
       return;
@@ -370,7 +417,7 @@ window.addEventListener("load", () => {
 
     if (!res || !res.ok || data.error) {
       setStatus('error', 'Something went wrong. Please try again or email us directly.');
-      if (window.turnstile) window.turnstile.reset();
+      resetTurnstileWidget(form);
       btn.disabled = false;
       btn.textContent = 'Send inquiry';
     } else {
