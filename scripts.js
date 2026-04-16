@@ -316,10 +316,19 @@ window.addEventListener("load", () => {
   const FUNCTION_URL      = SUPABASE_URL + '/functions/v1/submit-lead';
 
   const form   = document.getElementById('contact-form');
-  const status = document.getElementById('contact-form-status');
+  let status = document.getElementById('contact-form-status');
   const btn    = form ? form.querySelector('button[type="submit"]') : null;
 
-  if (!form || !status || !btn) return;
+  if (!form || !btn) return;
+
+  if (!status) {
+    console.warn('[contact-form] Missing #contact-form-status; creating fallback status element.');
+    status = document.createElement('div');
+    status.id = 'contact-form-status';
+    status.setAttribute('role', 'alert');
+    status.setAttribute('aria-live', 'polite');
+    form.appendChild(status);
+  }
 
   function setStatus(type, msg) {
     status.className = type ? 'contact-form-status--' + type : '';
